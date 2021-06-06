@@ -1,0 +1,13 @@
+on:
+  push:
+    tag: 'test[0-9]+'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "name: " ${{ github.event_name }}
+          echo "path: " ${{ github.event_path }}
+          echo "ref: " ${{ github.ref }}
+          echo "sha: " ${{ github.sha }}
