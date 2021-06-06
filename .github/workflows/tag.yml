@@ -1,7 +1,9 @@
 on:
   push:
-    branches-ignore: '**'
-    tags: 'test[0-9]+'
+    branches-ignore:
+      - '**'
+    tags:
+      - 'test[0-9]+'
 
 jobs:
   test:
