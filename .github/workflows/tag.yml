@@ -1,6 +1,6 @@
 on:
   push:
-    tag: 'test[0-9]+'
+    tags: 'test[0-9]+'
 
 jobs:
   test:
