@@ -42,7 +42,7 @@ jobs:
 
       - run: |
           pip install -U platformio
-          pio upgrade --dev
+          platformio upgrade --dev
 
       - run: |
           git config --global advice.detachedHead false
@@ -50,6 +50,7 @@ jobs:
           npm ci
           node node_modules/gulp/bin/gulp.js
           ./scripts/generate_release_sh.py \
+              --ignore secure-client \
               --destination ${GITHUB_WORKSPACE}/binaries \
               --builder-thread ${{ matrix.thread }} \
               --builder-total-threads 4 \
