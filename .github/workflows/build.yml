@@ -6,9 +6,6 @@ on:
       commit:
         description: "Commit to build"
         required: True
-      suffix:
-        suffix: "Build suffix"
-        required: True
 
 jobs:
   build:

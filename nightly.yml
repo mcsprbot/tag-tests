@@ -1,9 +1,11 @@
 name: Nightly
 
 on:
-  push:
-    branches: [nightly]
-    paths: commit.txt
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit to build"
+        required: True
 
 jobs:
   build:
@@ -14,23 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: nightly
-          path: nightly
-
-      - id: nightly-commit-getter
-        run: |
-          echo "::set-output name=commit::"$(cat nightly/commit.txt)
-
-      - uses: actions/checkout@v2
-        with:
-          ref: builder
-          path: builder
-
-      - uses: actions/checkout@v2
-        with:
           repository: xoseperez/espurna
           path: espurna
-          ref: ${{ steps.nightly-commit-getter.outputs.commit }}
+          ref: ${{ github.event.inputs.commit }}
 
       - uses: actions/setup-python@v2
         with:
@@ -53,9 +41,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('espurna/code/platformio.ini') }}
 
       - run: |
-        pip install -U platformio
-        pio upgrade --dev
-        pio install .
+          pip install -U platformio
+          pio upgrade --dev
 
       - run: |
           git config --global advice.detachedHead false
@@ -67,8 +54,8 @@ jobs:
               --builder-thread ${{ matrix.thread }} \
               --builder-total-threads 4 \
               --suffix nightly$(date +%Y%m%d) \
-              --revision ${{ steps.nightly-commit-getter.outputs.commit }} \
-              >> release.sh
+              --revision $(echo ${{ github.event.inputs.commit }} | cut -c-8) \
+              > release.sh
           bash release.sh
           popd
           zip -q -rr Binaries_${BUILDER_THREAD}.zip ${GITHUB_WORKSPACE}/binaries
@@ -81,6 +68,7 @@ jobs:
   upload:
     needs: build
     runs-on: ubuntu-20.04
+    steps:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -90,5 +78,4 @@ jobs:
           path: artifacts/
 
       - run:
-        ls -R
-        unzip 
+          ls -R artifacts/
