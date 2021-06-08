@@ -57,7 +57,7 @@ jobs:
               --builder-thread ${{ matrix.thread }} \
               --builder-total-threads 4 \
               --suffix nightly$(date +%Y%m%d) \
-              --revision ${{ steps.nightly-commit-getter.outputs.commit }} \
+              --revision $(echo ${{ github.event.inputs.commit }} | cut -c-8)
               >> release.sh
           bash release.sh
           popd
@@ -71,6 +71,7 @@ jobs:
   upload:
     needs: build
     runs-on: ubuntu-20.04
+    steps:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
