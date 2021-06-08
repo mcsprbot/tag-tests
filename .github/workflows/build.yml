@@ -1,0 +1,84 @@
+name: Nightly
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit to build"
+        required: True
+      suffix:
+        suffix: "Build suffix"
+        required: True
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        thread: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: xoseperez/espurna
+          path: espurna
+          ref: ${{ github.event.inputs.commit }}
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Cache Node
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ hashFiles('espurna/code/package-lock.json', 'espurna/code/package.json') }}
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v2
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('espurna/code/platformio.ini') }}
+
+      - run: |
+        pip install -U platformio
+        pio upgrade --dev
+
+      - run: |
+          git config --global advice.detachedHead false
+          pushd espurna/code
+          npm ci
+          node node_modules/gulp/bin/gulp.js
+          ./scripts/generate_release_sh.py \
+              --destination ${GITHUB_WORKSPACE}/binaries \
+              --builder-thread ${{ matrix.thread }} \
+              --builder-total-threads 4 \
+              --suffix nightly$(date +%Y%m%d) \
+              --revision ${{ steps.nightly-commit-getter.outputs.commit }} \
+              >> release.sh
+          bash release.sh
+          popd
+          zip -q -rr Binaries_${BUILDER_THREAD}.zip ${GITHUB_WORKSPACE}/binaries
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Binaries
+          path: Binaries_${{ matrix.thread }}.zip
+
+  upload:
+    needs: build
+    runs-on: ubuntu-20.04
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts/
+
+      - run:
+        ls -R
+        unzip 
