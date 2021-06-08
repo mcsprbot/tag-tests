@@ -81,5 +81,4 @@ jobs:
           path: artifacts/
 
       - run:
-        ls -R
-        unzip 
+          ls -R
