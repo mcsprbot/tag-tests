@@ -58,7 +58,7 @@ jobs:
               > release.sh
           bash release.sh
           popd
-          zip -q -rr Binaries_${BUILDER_THREAD}.zip ${GITHUB_WORKSPACE}/binaries
+          zip -q -rr Binaries_${{ matrix.thread }}.zip ${GITHUB_WORKSPACE}/binaries
 
       - uses: actions/upload-artifact@v2
         with:
