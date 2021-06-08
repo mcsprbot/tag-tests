@@ -44,8 +44,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('espurna/code/platformio.ini') }}
 
       - run: |
-        pip install -U platformio
-        pio upgrade --dev
+          pip install -U platformio
+          pio upgrade --dev
 
       - run: |
           git config --global advice.detachedHead false
