@@ -9,6 +9,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - run: |
+          ls -R
       - run: |
           echo "name: " ${{ github.event_name }}
           echo "path: " ${{ github.event_path }}
