@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - run: |
           previous=$(git --no-pager show HEAD~1:commit.txt)
           current=$(git --no-pager show HEAD:commit.txt)
