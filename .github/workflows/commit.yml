@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          printf 'before:%s\ncurrent:%s\n' \
-            $(git --no-pager show HEAD~1:commit.txt) \
-            $(git --no-pager show HEAD:commit.txt)
+          previous=$(git --no-pager show HEAD~1:commit.txt)
+          current=$(git --no-pager show HEAD:commit.txt)
+          printf 'before:%s\ncurrent:%s\n' $previous $current
+      - run: |
+          echo $previous
+          echo $current
